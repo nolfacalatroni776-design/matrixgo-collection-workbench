@@ -1,0 +1,740 @@
+{
+ "revision": 447,
+ "groups": {
+  "COMMON": {
+   "skippable": {
+    "kind": "bool",
+    "default": "FALSE",
+    "help": "设置当前语料是否可以跳过",
+    "choices": []
+   },
+   "withTranscription": {
+    "kind": "bool",
+    "default": "FALSE",
+    "help": "是否显示转录信息，起初只用在音频，后面都加上了",
+    "choices": []
+   },
+   "txType": {
+    "kind": "string",
+    "default": "text",
+    "help": "转录信息的输入方式：text 为可编辑文本；dropdown 为下拉单选框；radio 为单选框；checkbox 为多选框。选项类型配合 txValues 使用。录音文本的识别语言由 language 指定，配置 defaultTranscription 后改用预设文本。",
+    "choices": [
+     "text",
+     "dropdown",
+     "radio",
+     "checkbox"
+    ]
+   },
+   "txValues": {
+    "kind": "array",
+    "default": "[]",
+    "help": "选项，在txType !== text时使用",
+    "choices": []
+   },
+   "showFullPrediction": {
+    "kind": "bool",
+    "default": "FALSE",
+    "help": "文本转写编辑框在尚无 transcription 时，是否用 predictedTx 填充全文；默认 false。已有 transcription（包括 defaultTranscription 写入的内容）会优先显示，不受此开关影响。true 不显示候选补全；false 可能显示基于 predictedTx 的词语候选。此参数不控制是否调用微软识别。",
+    "choices": []
+   },
+   "defaultTranscription": {
+    "kind": "string",
+    "default": "未配置",
+    "help": "仅  recording 生效。配合 withTranscription=true、txType=text 使用。配置字符串后跳过微软识别，将此值同时写入 predictedTx 和 transcription；用户编辑只修改 transcription。空字符串同样跳过识别，需要填写内容后才能提交；未配置或不是字符串时沿用原识别流程。",
+    "choices": []
+   },
+   "disableEditTranscription": {
+    "kind": "bool",
+    "default": "FALSE",
+    "help": "当前录音文本转写的只读开关。false：可编辑并确认；true：禁止编辑且隐藏编辑框确认按钮。对微软识别结果和 defaultTranscription 均生效。它不控制是否识别，也不代表必须二次确认；提交仍按转写非空及其他录音规则校验。",
+    "choices": []
+   },
+   "forms": {
+    "kind": "array",
+    "default": "未配置（不显示表单入口）",
+    "help": "App 附加标签/表单配置，字段结构复用 Input。非空数组会在已接入的采集题型（如 recording、image、images、video、handwriting、voip）显示表单入口；INPUT、INSTRUCTION 不支持。可与 withTranscription 同时使用，二者独立。后台编辑时输入合法 JSON 数组，保存为数组；[] 关闭入口。",
+    "choices": []
+   }
+  },
+  "RECORDING": {
+   "sampleRate": {
+    "kind": "number",
+    "default": "16000",
+    "help": "采样率",
+    "choices": []
+   },
+   "channel": {
+    "kind": "number",
+    "default": "1",
+    "help": "声道",
+    "choices": [
+     "1",
+     "2"
+    ]
+   },
+   "micOrientation": {
+    "kind": "string",
+    "default": "bottom",
+    "help": "麦克风位置(only iOS)",
+    "choices": [
+     "front",
+     "bottom",
+     "back"
+    ]
+   },
+   "audioMaxDuration": {
+    "kind": "number",
+    "default": "60",
+    "help": "音频最大时长(单位：秒)",
+    "choices": []
+   },
+   "audioMinDuration": {
+    "kind": "number",
+    "default": "1",
+    "help": "音频最小时长(单位：秒)",
+    "choices": []
+   },
+   "accessBackgroundRecording": {
+    "kind": "bool",
+    "default": "TRUE",
+    "help": "当返回手机主页时是否继续录音（app没有被杀死的情况下）",
+    "choices": []
+   },
+   "isBluetooth": {
+    "kind": "bool",
+    "default": "FALSE",
+    "help": "使用要求使用蓝牙耳机录制",
+    "choices": []
+   },
+   "minLeadingSilence": {
+    "kind": "number",
+    "default": "0",
+    "help": "前置静音最小时长限制",
+    "choices": []
+   },
+   "maxLeadingSilence": {
+    "kind": "number",
+    "default": "0",
+    "help": "前置静音最大时长限制，与minTrailingSilence搭配使用，都等于0则不校验",
+    "choices": []
+   },
+   "minTrailingSilence": {
+    "kind": "number",
+    "default": "0",
+    "help": "后置静音最小",
+    "choices": []
+   },
+   "maxTrailingSilence": {
+    "kind": "number",
+    "default": "0",
+    "help": "后置静音最大，同maxLeadingSilence",
+    "choices": []
+   },
+   "minMiddleSilence": {
+    "kind": "number",
+    "default": "0",
+    "help": "音频中间最大静音段的最小时长限制",
+    "choices": []
+   },
+   "maxMiddleSilence": {
+    "kind": "number",
+    "default": "0",
+    "help": "音频中间最大静音段的最大时长限制，同maxLeadingSilence",
+    "choices": []
+   },
+   "enableSilenceCheck": {
+    "kind": "bool",
+    "default": "FALSE",
+    "help": "是否启用云端静音检查脚本",
+    "choices": []
+   },
+   "silenceVersion": {
+    "kind": "string",
+    "default": "v1",
+    "help": "使用的检查脚本版本v1使用澳洲提供的脚本v2使用了科大讯飞脚本（最好不用，几乎很少使用）v3使用了NICT的脚本（最好不用，几乎很少使用）与enableSilenceCheck为true时搭配使用",
+    "choices": [
+     "v1",
+     "v3"
+    ]
+   },
+   "silenceDB": {
+    "kind": "number",
+    "default": "-50",
+    "help": "静音阈值，与silenceVersion=v2搭配使用（最好不用，几乎很少使用）",
+    "choices": []
+   },
+   "transcriptionResult": {
+    "kind": "string",
+    "default": "-",
+    "help": "判断是否需要比较转录内容并设置转录的答案",
+    "choices": []
+   },
+   "passRate": {
+    "kind": "number",
+    "default": "100",
+    "help": "限制转录结果的正确率限制",
+    "choices": []
+   },
+   "language": {
+    "kind": "string",
+    "default": "en-US",
+    "help": "转录的语言",
+    "choices": []
+   },
+   "bkgRmsdB": {
+    "kind": "number",
+    "default": "-",
+    "help": "背噪值限制",
+    "choices": []
+   },
+   "bkgRmsdBA": {
+    "kind": "number",
+    "default": "-",
+    "help": "背噪值限制（使用 A 计权，在计算时对不同频率赋予不同权重，主要就是按人耳频率敏感度进行修正后的底噪强度）",
+    "choices": []
+   },
+   "absPeakdB": {
+    "kind": "number",
+    "default": "-",
+    "help": "幅值",
+    "choices": []
+   },
+   "minSNRdB": {
+    "kind": "number",
+    "default": "无",
+    "help": "信噪比最小限制",
+    "choices": []
+   },
+   "maxSNRdB": {
+    "kind": "number",
+    "default": "无",
+    "help": "信噪比最大限制",
+    "choices": []
+   },
+   "enableRealtimeAudioCheck": {
+    "kind": "bool",
+    "default": "false",
+    "help": "实时音频背噪和幅值的检查（一般用户长对话任务，最好不使用云端检查，文档）",
+    "choices": []
+   },
+   "forceStopOnRealtimeAudioFailure": {
+    "kind": "bool",
+    "default": "false",
+    "help": "如果背噪或幅值不通过，是否强制结束录音",
+    "choices": []
+   },
+   "disableAudioProcessing": {
+    "kind": "bool",
+    "default": "false",
+    "help": "是否关闭系统音频处理(文档)",
+    "choices": []
+   }
+  },
+  "IMAGE": {
+   "accessMediaLibrary": {
+    "kind": "bool",
+    "default": "FALSE",
+    "help": "是否允许使用系统相册",
+    "choices": []
+   },
+   "defaultCameraFacing": {
+    "kind": "string",
+    "default": "back",
+    "help": "默认打开的摄像头位置",
+    "choices": [
+     "front",
+     "back"
+    ]
+   },
+   "flashMode": {
+    "kind": "string",
+    "default": "auto",
+    "help": "闪光灯打开的模式",
+    "choices": [
+     "auto",
+     "on",
+     "off"
+    ]
+   },
+   "customResolution": {
+    "kind": "number",
+    "default": "by system",
+    "help": "像素",
+    "choices": [
+     "480",
+     "720",
+     "1080",
+     "1440",
+     "2160"
+    ]
+   },
+   "resolutionCheckMode": {
+    "kind": "string",
+    "default": "gte",
+    "help": "与customResolution搭配使用，用于上传的检查，设置检查的模式",
+    "choices": [
+     "eq",
+     "gt",
+     "lt",
+     "gte",
+     "lte"
+    ]
+   },
+   "locationRequired": {
+    "kind": "bool",
+    "default": "FALSE",
+    "help": "是否写入位置信息",
+    "choices": []
+   },
+   "ratio": {
+    "kind": "string",
+    "default": "-",
+    "help": "设置图片宽高比例，不传用系统默认",
+    "choices": [
+     "4:3",
+     "16:9",
+     "1:1"
+    ]
+   },
+   "fileMinSize": {
+    "kind": "number",
+    "default": "-",
+    "help": "限制文件最小存储大小，单位Kb",
+    "choices": []
+   },
+   "fileMaxSize": {
+    "kind": "number",
+    "default": "-",
+    "help": "限制文件最大存储大小",
+    "choices": []
+   }
+  },
+  "VIDEO": {
+   "accessMediaLibrary": {
+    "kind": "bool",
+    "default": "FALSE",
+    "help": "是否允许使用系统相册",
+    "choices": []
+   },
+   "defaultCameraFacing": {
+    "kind": "string",
+    "default": "back",
+    "help": "默认打开的摄像头位置",
+    "choices": [
+     "front",
+     "back"
+    ]
+   },
+   "flashMode": {
+    "kind": "string",
+    "default": "auto",
+    "help": "闪光灯打开的模式",
+    "choices": [
+     "auto",
+     "on",
+     "off"
+    ]
+   },
+   "videoQuality": {
+    "kind": "string",
+    "default": "high",
+    "help": "视频分辨率low: 480pmedium: 720phigh: 1080p",
+    "choices": [
+     "low",
+     "medium",
+     "high"
+    ]
+   },
+   "customResolution": {
+    "kind": "number",
+    "default": "by system",
+    "help": "视频分辨率，优先级比videoQuality高",
+    "choices": [
+     "480",
+     "720",
+     "1080",
+     "1440",
+     "2160"
+    ]
+   },
+   "videoMaxDuration": {
+    "kind": "number",
+    "default": "600",
+    "help": "视频最大时长限制",
+    "choices": []
+   },
+   "videoMinDuration": {
+    "kind": "number",
+    "default": "0",
+    "help": "视频最小时长限制，等于0则不校验",
+    "choices": []
+   },
+   "customFrameRate": {
+    "kind": "number",
+    "default": "-",
+    "help": "视频帧率",
+    "choices": [
+     "30",
+     "60"
+    ]
+   },
+   "frameRateCheckMode": {
+    "kind": "string",
+    "default": "eq",
+    "help": "与customFrameRate搭配使用，用于上传前的帧数检查模式",
+    "choices": [
+     "eq",
+     "gt",
+     "lt",
+     "gte",
+     "lte"
+    ]
+   },
+   "resolutionCheckMode": {
+    "kind": "string",
+    "default": "gte",
+    "help": "与customFrameRate搭配使用，用于上传前的像素检查模式",
+    "choices": [
+     "eq",
+     "gt",
+     "lt",
+     "gte",
+     "lte"
+    ]
+   }
+  },
+  "EMBODIED_VIDEO": {
+   "query": {
+    "kind": "string",
+    "default": "-",
+    "help": "任务指令，必填",
+    "choices": []
+   },
+   "steps": {
+    "kind": "array",
+    "default": "-",
+    "help": "任务步骤",
+    "choices": []
+   },
+   "handDetectionWindowMs": {
+    "kind": "number",
+    "default": "1000",
+    "help": "判断“手不在画面”的时间窗口，单位毫秒",
+    "choices": []
+   },
+   "requireHandCount": {
+    "kind": "number",
+    "default": "1",
+    "help": "判断“手在画面中”需要几只手  \n 1 ：只要检测到至少 1 只手，就认为手在画面中  \n 2 ：必须检测到 2 只手，才认为手在画面中；如果只检测到 1 只手，也会被算作“不满足”",
+    "choices": [
+     "1",
+     "2"
+    ]
+   },
+   "noHandRatio": {
+    "kind": "number",
+    "default": "0.1",
+    "help": "时间窗口内有手的帧数/时间窗口总帧数",
+    "choices": []
+   },
+   "locale": {
+    "kind": "string",
+    "default": "zh-CN",
+    "help": "TTS播报的语言",
+    "choices": [
+     "zh-CN",
+     "en-US"
+    ]
+   },
+   "allowManualStop": {
+    "kind": "bool",
+    "default": "false",
+    "help": "配置是否允许手动结束录制",
+    "choices": []
+   }
+  },
+  "GUI": {
+   "query": {
+    "kind": "string",
+    "default": "-",
+    "help": "任务指令，必填",
+    "choices": []
+   },
+   "form": {
+    "kind": "array",
+    "default": "-",
+    "help": "关联自定义表单，为整条任务的属性，表单配置JSON字符串，支持单选、多选、文本输入框、级联选择题等",
+    "choices": []
+   },
+   "stepForm": {
+    "kind": "array",
+    "default": "-",
+    "help": "关联自定义表单，为任务中每个步骤的属性，表单配置JSON字符串，支持单选、多选、文本输入框、级联选择题等",
+    "choices": []
+   },
+   "enableAIGenerate": {
+    "kind": "bool",
+    "default": "false",
+    "help": "智能生成步骤指令及描述，默认关闭，开启后，可调用模型生成「当前步骤指令」和「当前步骤描述」，无需手动编写（此配置将产生额外的费用，请确认项目成本可接受后再打开）",
+    "choices": []
+   },
+   "locale": {
+    "kind": "string",
+    "default": "zh-CN",
+    "help": "智能生成基准语言，默认为简体中文，如需生成英文、日文、韩文等其他语言内容，可设置为目标语言名称",
+    "choices": [
+     "zh-CN",
+     "en-US"
+    ]
+   }
+  },
+  "HANDWRITING": {
+   "showPromptText": {
+    "kind": "bool",
+    "default": "FALSE",
+    "help": "画板页是否显示Prompt富文本内容，false会默认显示签名相关的提示内容",
+    "choices": []
+   },
+   "customHeight": {
+    "kind": "number",
+    "default": "50",
+    "help": "画板页顶部提示区域自定义高度，该高度会动态影响到画板的面积",
+    "choices": []
+   },
+   "signatureCaptureVersion": {
+    "kind": "string",
+    "default": "v1",
+    "help": "签名的版本v1: native端实现v2: js端实现（带撤回功能）",
+    "choices": [
+     "v1",
+     "v2"
+    ]
+   },
+   "enableUndo": {
+    "kind": "bool",
+    "default": "false",
+    "help": "MatrixGo CLI 手写兼容字段（不在飞书属性表）：v2 画布显示撤销按钮。",
+    "choices": [],
+    "source": "cli"
+   },
+   "forceVersion": {
+    "kind": "bool",
+    "default": "false",
+    "help": "MatrixGo CLI 手写兼容字段（不在飞书属性表）：强制使用指定的书写画布版本。",
+    "choices": [],
+    "source": "cli"
+   }
+  },
+  "VOIP": {
+   "singleMinDuration": {
+    "kind": "number",
+    "default": "0",
+    "help": "单次通话的最小有效时长（单位：秒）仅在channel=twilio有效",
+    "choices": []
+   },
+   "totalMinDuration": {
+    "kind": "number",
+    "default": "600(10分钟)",
+    "help": "当前主题录音的最小时长，单位：秒；达到或超过此值才允许提交并进入下一个主题。Agora V2 在提交时读取本地录音文件时长进行校验。  \n本次双人通话测试语料显式设置 totalMinDuration: 20，即至少录制 20 秒；20 是测试配置值，不修改本表原有默认值。该参数不控制声网音频处理，也不会在 20 秒时自动结束通话。",
+    "choices": []
+   },
+   "totalMaxDuration": {
+    "kind": "number",
+    "default": "900(15分钟)",
+    "help": "当前主题下所有单次通话音频时长的总和不会高于此值，系统会基于此值设置通话结束时间",
+    "choices": []
+   },
+   "voipChannel": {
+    "kind": "string",
+    "default": "agora",
+    "help": "供应商渠道twilio 默认生成8k（采样率），双声道（左主右被）agora 上传的音频就是当次worker通话的音频录音，非双人录音",
+    "choices": [
+     "agora",
+     "twilio"
+    ]
+   },
+   "cloudRecording": {
+    "kind": "bool",
+    "default": "TRUE",
+    "help": "是否启动云端录音，仅在channel=agroa有效，云端录音的文件需要pe后处理获取到",
+    "choices": []
+   },
+   "individualRecording": {
+    "kind": "bool",
+    "default": "false",
+    "help": "channel=agora生效，表示是否录制每个人的音频",
+    "choices": []
+   },
+   "connectLimit": {
+    "kind": "number",
+    "default": "2",
+    "help": "channel=agora生效。2人是1:1的对话，>=3 则是多人同一个房间",
+    "choices": []
+   },
+   "sampleRate": {
+    "kind": "number",
+    "default": "16000",
+    "help": "channel=agora生效，用于本地录制的音频配置",
+    "choices": []
+   },
+   "channelProfile": {
+    "kind": "number",
+    "default": "0；旧策略触发时为 1",
+    "help": "仅 voipChannel=agora 的双人通话生效，connectLimit 通常设为 2。频道场景，对应 ChannelProfileType。有效的显式配置优先于 disableAgora3A、forcePhoneMic 的自动选择。  \nChannelProfileCommunication  \n0：通信场景。声网建议优先采用直播场景，以获得更好的音视频体验。  \nChannelProfileLiveBroadcasting  \n1：直播场景，也是声网 SDK 文档中的默认频道场景。本 App 双人通话选择此值时，会以主播身份发布麦克风音频。  \nApp 默认规则：未配置或值无效时，disableAgora3A=true 或 forcePhoneMic=true 则取 1，否则取 0。SDK 默认值与 App 的默认选择不同。  \n仅接受 0、1 及对应数字字符串（如 \"0\"、\"1\"）；不接受枚举名称字符串。SDK 中已废弃的 2、3 不属于本 App 此属性支持的值。同一频道的双方应使用一致的 channelProfile。  \n声网 ChannelProfileType 枚举说明",
+    "choices": [
+     "0",
+     "1"
+    ]
+   },
+   "audioScenario": {
+    "kind": "number",
+    "default": "0；旧策略触发时为 3",
+    "help": "仅 voipChannel=agora 的双人通话生效，connectLimit 通常设为 2。音频应用场景，对应 AudioScenarioType。有效的显式配置优先于旧的场景选择逻辑。  \nAudioScenarioDefault  \n0：（默认）自动场景，根据用户角色和音频路由自动匹配合适的音质。  \nAudioScenarioGameStreaming  \n3：高音质场景，适用于音乐为主的场景。例如：乐器陪练。  \nAudioScenarioChatroom  \n5：聊天室场景，适用于用户需要频繁上下麦的场景。例如：教育场景。  \nAudioScenarioChorus  \n7：合唱场景。适用于网络条件良好，要求极低延时的实时合唱场景。  \nAudioScenarioMeeting  \n8：会议场景，适用于人声为主的多人会议。  \nAudioScenarioAiServer  \n9：当前安装的 react-native-agora 4.5.2-audio.1 包中的内部枚举，标记为 @ignore。当前 App 解析器会接受并传给 SDK，但公开文档未提供业务用途和可用性承诺，不建议在普通双人通话语料中使用。  \nAudioScenarioAiClient  \n10：AI 对话场景，仅适用于与声网对话式 AI 引擎创建的智能体互动的场景。  \nAudioScenarioNum  \n11：枚举数量/边界标记，不是音频场景。当前 App 显式排除此值，不可配置；2、4、6 等未定义值同样不接受。  \nApp 默认规则：未配置或值无效时，disableAgora3A=true 或 forcePhoneMic=true 则取 3，否则取 0。接受数字和对应数字字符串，不接受枚举名称字符串。  \n本次媒体音量测试统一设为 3。音量类型还取决于平台和实际路由：按声网文档，GameStreaming 下 Android 听筒仍为通话音量、扬声器为媒体音量；iOS 听筒/扬声器为媒体音量。audioScenario 不等于音频编码属性 audioProfile。  \n声网 AudioScenarioType 枚举说明  \n声网：媒体音量与通话音量",
+    "choices": [
+     "0",
+     "3",
+     "5",
+     "7",
+     "8",
+     "9",
+     "10"
+    ]
+   },
+   "aecEnable": {
+    "kind": "bool",
+    "default": "true",
+    "help": "仅 voipChannel=agora 的双人通话生效，connectLimit 通常设为 2。是否启用声网回声消除（AEC），用于抑制对端播放声音重新进入本端麦克风所产生的回声。  \ntrue：请求开启 AEC；false：请求关闭 AEC。显式 false 优先，不会被默认 true 或 disableAgora3A 覆盖。未配置或值无效时为 true。  \n当前通过 che.audio.aec.enable 下发。关闭此参数不等于确认已关闭设备所有系统/硬件回声处理；实际效果以真机和 SDK 支持情况为准。",
+    "choices": []
+   },
+   "ansEnable": {
+    "kind": "bool",
+    "default": "true；disableAgora3A=true 时默认 false",
+    "help": "仅 voipChannel=agora 的双人通话生效，connectLimit 通常设为 2。是否启用声网自动噪声抑制（ANS），用于抑制麦克风中的背景噪声。  \ntrue：请求开启 ANS；false：请求关闭 ANS。显式配置优先于 disableAgora3A，例如 disableAgora3A=true 且 ansEnable=true 时仍开启 ANS。  \n未配置或值无效时保留旧逻辑：disableAgora3A=true 则关闭，否则开启。当前通过 che.audio.ans.enable 下发。",
+    "choices": []
+   },
+   "agcEnable": {
+    "kind": "bool",
+    "default": "true",
+    "help": "仅 voipChannel=agora 的双人通话生效，connectLimit 通常设为 2。是否启用声网自动增益控制（AGC），用于自动调整采集音频的增益，使音量更稳定。  \ntrue：请求开启 AGC；false：请求关闭 AGC。显式 false 优先，未配置或值无效时为 true；disableAgora3A 不会自动关闭此项。  \n当前通过 che.audio.agc.enable 下发，每次双人通话入会前重新应用。",
+    "choices": []
+   },
+   "speakerphoneEnable": {
+    "kind": "bool",
+    "default": "false；disableAgora3A=true 时默认 true",
+    "help": "仅 voipChannel=agora 的双人通话生效，connectLimit 通常设为 2。控制播放输出路由。在没有外接有线或蓝牙设备且设备支持听筒时，true 为扬声器外放，false 为听筒。此参数不直接选择麦克风。  \n显式 true/false 优先于 disableAgora3A 的旧外放策略；例如 disableAgora3A=true 且 speakerphoneEnable=false 时请求听筒。  \n未配置或值无效时：disableAgora3A=true 则默认外放，否则默认听筒。入会前设置默认路由；明确配置此参数时，入会成功后再次设置当前路由。  \n连接有线或蓝牙设备时，外接设备路由可能优先；实际输出以系统和 SDK 的路由回调为准。切换扬声器本身不保证所有平台都切换为同一种音量类型。",
+    "choices": []
+   },
+   "disableAgora3A": {
+    "kind": "bool",
+    "default": "false",
+    "help": "旧参数，以下说明针对 Agora 双人通话。true 表示启用原有的保留背景声配置策略，不是同时关闭 AEC、ANS、AGC 的总开关。  \ntrue 且对应新参数未明确配置时：channelProfile=1、audioScenario=3、ansEnable=false、speakerphoneEnable=true；aecEnable 和 agcEnable 仍默认 true。  \nfalse 时不启用上述策略；未配置或值无效按 false。forcePhoneMic=true 仍可使频道/场景默认选择 1/3。  \n有效的 channelProfile、audioScenario、aecEnable、ansEnable、agcEnable、speakerphoneEnable 显式配置分别优先，允许覆盖旧策略。",
+    "choices": []
+   },
+   "forcePhoneMic": {
+    "kind": "bool",
+    "default": "false",
+    "help": "仅 voipChannel=agora 的双人通话生效。用于请求蓝牙采用 A2DP 播放策略，以手机麦克风采集、蓝牙耳机播放为目标；有线耳机继续沿用系统默认采集，不强制改用手机麦克风。  \ntrue：下发 che.audio.force_bluetooth_a2dp=true；false 或未配置：下发 false。具体设备是否采用预期输入/输出路由，需要以真机路由及录音结果为准。  \n在双人通话中，true 且未显式配置频道/场景时，默认 channelProfile=1、audioScenario=3；显式 channelProfile、audioScenario 优先。此参数本身不会关闭 AEC、ANS、AGC，也不直接开启扬声器。",
+    "choices": []
+   },
+   "enableRealtimeAudioCheck": {
+    "kind": "bool",
+    "default": "false",
+    "help": "SessionV2 声网通话中启用幅值和底噪超限检测。关闭时仍会记录峰值，提交时仍按 minPeakLimit 检查。",
+    "choices": []
+   },
+   "forceStopOnRealtimeAudioFailure": {
+    "kind": "bool",
+    "default": "false",
+    "help": "启用实时检测后，幅值或底噪超限时，true 会停止录制并退出通话，false 只提示。",
+    "choices": []
+   },
+   "maxPeakLimit": {
+    "kind": "number",
+    "default": "0",
+    "help": "实时幅值上限，单位为 PCM16 绝对采样值。设为 20000 时，本机同一声道连续 3 个采样点的绝对值大于 20000 才触发。",
+    "choices": []
+   },
+   "absPeakdB": {
+    "kind": "number",
+    "default": "未配置",
+    "help": "实时幅值上限的备用值，单位为 dBFS。仅在 maxPeakLimit 没有有效正值时使用。通常填写负数，0 表示未配置。",
+    "choices": []
+   },
+   "bkgRmsdB": {
+    "kind": "number",
+    "default": "未配置",
+    "help": "实时底噪上限，单位为 dBFS。估算的底噪高于阈值时触发。例如上限为 −50 dBFS，测得 −45 dBFS 时超限。0 表示未配置。",
+    "choices": []
+   },
+   "minPeakLimit": {
+    "kind": "number",
+    "default": "0",
+    "help": "提交前检查本机整段录音的最大绝对幅值，单位为 PCM16 绝对采样值。低于下限时提示音量过低并要求重录。例如设为 3000，2999 会被拦截，3000 可通过。录制中不会因声音暂时偏轻而中断。提交记录中的实测值见 extraInfo.selfData.maxAbsPeakInt。 实时音频质量检测说明",
+    "choices": []
+   }
+  }
+ },
+ "commonByType": {
+  "INSTRUCTION": [
+   "skippable"
+  ],
+  "INPUT": [
+   "skippable"
+  ],
+  "RECORDING": [
+   "skippable",
+   "withTranscription",
+   "txType",
+   "txValues",
+   "showFullPrediction",
+   "defaultTranscription",
+   "disableEditTranscription",
+   "forms"
+  ],
+  "IMAGE": [
+   "skippable",
+   "withTranscription",
+   "txType",
+   "txValues",
+   "forms"
+  ],
+  "IMAGES": [
+   "skippable",
+   "withTranscription",
+   "txType",
+   "txValues",
+   "forms"
+  ],
+  "VIDEO": [
+   "skippable",
+   "withTranscription",
+   "txType",
+   "txValues",
+   "forms"
+  ],
+  "HANDWRITING": [
+   "skippable",
+   "withTranscription",
+   "txType",
+   "txValues",
+   "forms"
+  ],
+  "VOIP": [
+   "skippable",
+   "withTranscription",
+   "txType",
+   "txValues",
+   "forms"
+  ],
+  "GUI": [
+   "skippable"
+  ],
+  "EMBODIED_VIDEO": [
+   "skippable"
+  ]
+ },
+ "inherits": {
+  "IMAGES": "IMAGE",
+  "EMBODIED_VIDEO": "VIDEO"
+ }
+}
