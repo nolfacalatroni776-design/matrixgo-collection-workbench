@@ -7,5 +7,5 @@ def handle(path, payload):
  c=d['config'];c['action']='generate' if path=='/theme-plan' else 'import'
  csv,w=prepare(c,data_only=True);b=c['batch']
  if path=='/theme-plan':return json.dumps(dict(totalQuantity=b['copies'],skipQuantity=b['skip'],rules=b['rules']))
- return json.dumps(dict(csv=csv,warnings=w,steps=['下载 CSV 或将草稿交给本机配置台','用本人账号核对线上目标并确认导入']))`);return py.globals.get('handle')})();
+ return json.dumps(dict(csv=csv,warnings=w,steps=['下载 CSV 或将草稿交给本机配置台','用本人账号核对所选环境的目标并确认导入']))`);return py.globals.get('handle')})();
 onmessage=async({data:{id,path,body}})=>{try{const handle=await ready;postMessage({id,value:JSON.parse(handle(path,JSON.stringify(body)))})}catch(e){postMessage({id,error:(String(e).trim().split('\n').at(-1)||'校验失败').replace(/^ValueError: /,'')})}};

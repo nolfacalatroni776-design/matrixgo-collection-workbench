@@ -28,7 +28,7 @@ const csvLens = (() => {
     target.id='csv-detail-'+id;button.setAttribute('aria-controls',target.id);host.append(target);
   }
   function mount() {
-    if (page!==1) {clearTimeout(timer);pending='';serial++;return;}
+    if (page!==1 || !q()) {clearTimeout(timer);pending='';serial++;return;}
     if (q()!==question) {question=q();selected='';rowOpen=false;}
     if (!$('csv-bar')) {
       document.querySelector('#page .tools').insertAdjacentHTML('afterend',bar());
@@ -124,7 +124,7 @@ const specimen=(()=>{
   let face=0, lastPage=-1, lastKey='', timer, tick=0;
   const names=['题面','属性','导出行'];
   function sync() {
-    const deck=$('specimen');if(!deck || !q()) return;
+    const deck=$('specimen');if(!deck)return;deck.hidden=!q();if(!q())return;
     const cards=[...deck.querySelectorAll('.deck-card')],it=q();
     cards.forEach((card,i)=>{card.dataset.rank=String((i-face+3)%3);});
     cards[0].querySelector('.deck-body').textContent=it.content||'尚未填写题面';
